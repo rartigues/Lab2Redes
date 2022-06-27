@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Custom
+test.py
+keys/client/*
+keys/server/*
+download/*

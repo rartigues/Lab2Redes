@@ -1,7 +1,7 @@
 from os import system, name
 from time import sleep
 
-class ClearService:
+class RecieveService:
     def clear(self):
         
         sleep(0.1)

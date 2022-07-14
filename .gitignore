@@ -130,6 +130,4 @@ dmypy.json
 
 # Custom
 test.py
-keys/client/*
-keys/server/*
-download/*
+download/client/*

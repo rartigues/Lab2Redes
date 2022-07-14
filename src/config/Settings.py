@@ -14,6 +14,10 @@ class Settings:
         PORT = int(os.getenv("PORT"))
         ADDR = (IP, PORT)
         FORMAT = "utf-8"
+        BUFFER_SIZE = int(os.getenv("BUFFER_SIZE"))
+        DOWNLOAD_PATH = os.path.join(os.getcwd(), "download", "client")
+        UPLOAD_PATH = os.path.join(os.getcwd(), "download", "server")
+        
         if (sys.argv[1]=="-s" or sys.argv[1]=="--server"):
             SERVER_KEY = base64.b64decode(bytes(os.getenv("SERVER_KEY"), "utf-8"))
             CLIENT_KEY = None

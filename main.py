@@ -1,6 +1,6 @@
 import sys
-from services.SendService import SendService
-from services.RecieveService import RecieveService
+from src.services.SendService import SendService
+from src.services.RecieveService import RecieveService
 
 def main():
     if(len(sys.argv)>2):

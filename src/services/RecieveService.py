@@ -16,11 +16,11 @@ class RecieveService:
 
     #Recieve data from SendService with UDP protocol
     def recieveData(self):
-        socket= RUDPClient(hostname=self.ip, port=self.port)
+        client= RUDPClient(hostname=self.ip, port=self.port)
         
         # try:
 
-        reply=socket.send_recv(b'Holis existo')
+        reply=client.send_recv('Holis existo', Settings.BUFFER_SIZE)
         #this reply equals a list of different name files in the directory
         #display the list of files and ask the user to choose one
         print(f"\n[INFO] Recibido: {reply}")
@@ -28,24 +28,51 @@ class RecieveService:
         for i in range(len(reply)):
             print(f"{i} - {reply[i]}")
         file_index=int(input("\nIngrese el numero del archivo: "))
-        #send the name of the file to the server
+        fileName = reply[file_index]
 
-
-        file_size=socket.send_recv(reply[file_index])
+        file_size=client.send_recv(reply[file_index], Settings.BUFFER_SIZE)
         print(f"\n[INFO] Tamaño del archivo: {file_size}")
 
+        #recieve all the file packets
+        remainingSize = file_size
+        with open(Settings.DOWNLOAD_PATH + "/" + fileName, mode='wb') as file:
+            while remainingSize > 0:
+                if remainingSize > Settings.BUFFER_SIZE:
+                    data = client.send_recv('', Settings.BUFFER_SIZE+1024*1024)
+                    file.write(data)
+                    remainingSize -= Settings.BUFFER_SIZE
+                else:
+                    data = client.send_recv('', remainingSize+1024*1024)
+                    file.write(data)
+                    remainingSize = 0
+        print(f"\n[INFO] Archivo {fileName} recibido")
+        
 
-        file_data=socket.send_recv('a')
-        #mirar esto depsues
-        print(f"\n[INFO] Recibido: {file_data}")
-        file_name="RobLindouwu.gif"
-        print(f"\n[INFO] Guardando archivo: {file_name}")
-        with open(file_name, 'wb') as f:
-            f.write(file_data)
-        print(f"\n[INFO] Archivo guardado: {file_name}")
-        # except:
-        #     print("Error")
-        time.sleep(1)
+
+            # fileContent = client.send_recv('', file_size+(1024*1024))
+            # file.write(fileContent)
+            # print(f"\n[INFO] Archivo {fileName} recibido")
+
+
+        
+
+
+
+
+        # file_data=socket.send_recv('a')
+        # #mirar esto depsues
+        # print(f"\n[INFO] Recibido: {fileName}")
+        # print(f"\n[INFO] Guardando archivo: {fileName}")
+        # # save file in DOWNLOAD_PATH
+        # savePath=Settings.DOWNLOAD_PATH
+        # if not os.path.exists(savePath):
+        #     os.makedirs(savePath)
+        # with open(savePath + "/" + fileName, mode='wb') as file:
+        #     file.write(file_data)
+        # print(f"\n[INFO] Archivo guardado: {fileName}")
+        # # except:
+        # #     print("Error")
+        # time.sleep(1)
         
 
 

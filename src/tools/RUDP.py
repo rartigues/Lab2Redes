@@ -65,7 +65,7 @@ class RUDPClient:
             print("Couldn't initialise client", file=sys.stderr)
             sys.exit(1)
 
-    def send_recv(self, payload: bytes):
+    def send_recv(self, payload: bytes, responseSize: int):
         timestamp = self.__rtt.timestamp()
         datagram = RUDPDatagram(
             address=(self.__hostname, self.__port),
@@ -98,7 +98,7 @@ class RUDPClient:
                 try:
                     if event.wait(timeout=0.05):
                         break
-                    message = self.socket.recv(self.BUFFER_SIZE)
+                    message = self.socket.recv(responseSize)
                     response = pickle.loads(message)
                 except BlockingIOError:
                     continue

@@ -26,17 +26,33 @@ class SendService:
 
             file_name, address = socket.receive()
             print(f"\n[INFO] Recibido: {file_name} desde {address}")
-            file_size = os.path.getsize(Settings.UPLOAD_PATH + "/" + file_name)
+
+
+            savePath=Settings.UPLOAD_PATH
+            if not os.path.exists(savePath):
+                os.makedirs(savePath)
+            file_size = os.path.getsize(savePath + "/" + file_name)
             print(f"\n[INFO] Tamaño del archivo: {file_size}")
             socket.reply(address, file_size)
             message,address= socket.receive()
-            #send file to client
             print(f"\n[INFO] Recibido: {message} desde {address}")
             
 
-            with open(Settings.UPLOAD_PATH + "/" + file_name, mode='rb') as file: # b is important -> binary
-                fileContent = file.read(self.buffer)
-                socket.reply(address, fileContent)             
-
-            
-
+            try:
+                with open(Settings.UPLOAD_PATH + "/" + file_name, mode='rb') as file:
+                    remainingSize = file_size
+                    while remainingSize > 0:
+                        if remainingSize > self.buffer:
+                            socket.receive()
+                            data = file.read(self.buffer)
+                            socket.reply(address, data)
+                            remainingSize -= self.buffer
+                        else:
+                            socket.receive()
+                            data = file.read(remainingSize)
+                            socket.reply(address, data)
+                            remainingSize = 0
+                print(f"\n\n[INFO] Archivo {file_name} enviado")
+            except:
+                pass
+                

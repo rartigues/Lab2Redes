@@ -5,6 +5,7 @@ import _thread
 import threading
 
 import src.services.RTTService as rtt
+from src.config.Settings import Settings
 
 
 class RUDPDatagram:
@@ -17,11 +18,14 @@ class RUDPDatagram:
         self.address = kwargs["address"]
         self.sequence_no = kwargs["sequence_no"]
         self.timestamp = kwargs["timestamp"]
+        self.BUFFER_SIZE = Settings.BUFFER_SIZE
+        
 
 
 class RUDPServer:
     def __init__(self, port: int, debug: bool = False):
         self.__debug = debug
+        self.BUFFER_SIZE = Settings.BUFFER_SIZE
 
         try:
             self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -31,7 +35,7 @@ class RUDPServer:
             sys.exit(1)
 
     def receive(self):
-        message, address = self.__socket.recvfrom(1024)
+        message, address = self.__socket.recvfrom(self.BUFFER_SIZE)
         datagram = pickle.loads(message)
 
         self.__last_seqno = datagram.sequence_no
@@ -43,7 +47,6 @@ class RUDPServer:
         datagram = RUDPDatagram(payload=payload, address=address,
                                 sequence_no=self.__last_seqno, timestamp=self.__last_ts)
         serialised_datagram = pickle.dumps(datagram)
-
         self.__socket.sendto(serialised_datagram, address)
 
 
@@ -53,6 +56,7 @@ class RUDPClient:
         self.__port = port
         self.__sequence_no = 0
         self.__rtt = rtt.RTTService()
+        self.BUFFER_SIZE = Settings.BUFFER_SIZE
 
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -94,8 +98,7 @@ class RUDPClient:
                 try:
                     if event.wait(timeout=0.05):
                         break
-
-                    message = self.socket.recv(1024)
+                    message = self.socket.recv(self.BUFFER_SIZE)
                     response = pickle.loads(message)
                 except BlockingIOError:
                     continue

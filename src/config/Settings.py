@@ -14,7 +14,7 @@ class Settings:
         PORT = int(os.getenv("PORT"))
         ADDR = (IP, PORT)
         FORMAT = "utf-8"
-        BUFFER_SIZE = int(os.getenv("BUFFER_SIZE"))
+        BUFFER_SIZE = 1500
         DOWNLOAD_PATH = os.path.join(os.getcwd(), "download", "client")
         UPLOAD_PATH = os.path.join(os.getcwd(), "download", "server")
         
